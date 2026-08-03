@@ -148,8 +148,9 @@ function onMeta() {
     $("btn-again").style.display = IS_HOST ? "block" : "none"; $("done-hint").textContent = IS_HOST ? "" : "Waiting for the host…";
     if (soundState !== "done") { soundState = "done"; Sound.end(); }
   } else { // playing or reveal
-    show("screen-game"); renderGame();
+    show("screen-game");
     if (meta.state === "playing" && meta.currentQ && meta.currentQ.qid !== lastQid) { lastQid = meta.currentQ.qid; myAnswer = null; if (!IS_HOST) Sound.q(); soundState = ""; }
+    renderGame();
   }
   if (IS_HOST && (meta.state === "playing")) { startHostTimer(); } else { stopHostTimer(); }
 }
@@ -195,7 +196,7 @@ function renderGame() {
       if (!IS_HOST && myAnswer && myAnswer.choice === i && i !== meta.reveal.correctIndex) b.classList.add("wrong");
     } else if (IS_HOST) {
       // host sees the correct one marked (to read it out) once content is known
-      const full = lookupQ(q.qid); if (full && i === full.c) b.classList.add("host-key");
+      const full = lookupQ(q.qid); if (full && choice === full.a[full.c]) b.classList.add("host-key");
     } else if (myAnswer && myAnswer.choice === i) { b.classList.add("chosen"); }
     if (!IS_HOST && meta.state === "playing" && !myAnswer) b.addEventListener("click", () => submitAnswer(i));
     else b.disabled = true;
@@ -271,7 +272,7 @@ async function drawNext(first) {
   const now = Date.now();
   await update(ref(db, `trivia/${ROOM}/meta`), {
     state: "playing", qIndex, usedQ: used, reveal: null,
-    currentQ: { qid, category: full.cat, q: full.q, choices: full.a, startedAt: now, endsAt: now + (meta.questionSeconds || 20) * 1000 },
+    currentQ: { qid, category: full.cat, q: full.q, choices: pickN(full.a, full.a.length), startedAt: now, endsAt: now + (meta.questionSeconds || 20) * 1000 },
   });
 }
 function startHostTimer() { if (hostTimer) return; hostTimer = setInterval(() => { if (!IS_HOST || !meta || meta.state !== "playing") return; renderGame(); if (meta.currentQ && Date.now() >= meta.currentQ.endsAt) doReveal(); }, 400); }
@@ -283,7 +284,7 @@ function checkAllAnswered() {
 async function doReveal() {
   if (!IS_HOST || revealing || !meta || meta.state !== "playing" || !meta.currentQ) return;
   revealing = true; stopHostTimer();
-  const q = meta.currentQ; const full = lookupQ(q.qid); const correctIndex = full ? full.c : 0;
+  const q = meta.currentQ; const full = lookupQ(q.qid); const correctText = full ? full.a[full.c] : null; const correctIndex = q.choices.indexOf(correctText);
   const secs = (meta.questionSeconds || 20) * 1000;
   const updates = {};
   for (const [uid, p] of Object.entries(players)) {
