@@ -45,7 +45,7 @@ onAuthStateChanged(auth, (u) => { if (u) { ME = u.uid; offerRejoin(); } });
 signInAnonymously(auth).catch((e) => { $("join-error").textContent = "Couldn't connect to the server. (" + e.code + ")"; });
 
 // ---- EID gate (format not revealed): VS + 5 digits, or MLG + 4 digits ------
-const EID_RE = /^(VS\d{5}|MLG\d{4})$/;
+const EID_RE = /^(VS\d{5}|MLG\d{4}|A\d{4}|INT\d{4})$/;
 function getEid() { const raw = ($("eid").value || "").trim().toUpperCase(); if (!EID_RE.test(raw)) { $("join-error").textContent = "Enter a valid Employee ID to play."; return null; } return raw; }
 function getName() { const n = ($("name").value || "").trim(); if (!n) $("join-error").textContent = "Enter your name first."; return n; }
 
