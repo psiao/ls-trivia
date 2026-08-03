@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LS Trivia</title>
+  <link rel="stylesheet" href="styles.css?v=1" />
+</head>
+<body>
+
+  <!-- JOIN -->
+  <section id="screen-join" class="screen active">
+    <div class="wrap">
+      <div class="brandbar"><div class="logo">LS</div><div><h1>Trivia</h1><p class="tagline">A Legal Soft game</p></div></div>
+      <div class="card">
+        <div class="field"><label for="name">Your name</label><input id="name" maxlength="20" placeholder="e.g. Alex" autocomplete="off" /></div>
+        <div class="field"><label for="eid">Employee ID</label><input id="eid" maxlength="10" placeholder="Employee ID" autocomplete="off" style="text-transform:uppercase" /></div>
+        <div class="field"><label for="join-code">Join a game</label>
+          <div class="row"><input id="join-code" maxlength="4" placeholder="CODE" style="text-transform:uppercase" autocomplete="off" /><button id="btn-join" class="btn-primary" style="flex:0 0 auto">Join</button></div>
+        </div>
+        <div class="divider">or host a new game</div>
+        <div class="field"><label for="opt-cat">Category</label>
+          <select id="opt-cat">
+            <option value="mixed" selected>Mixed (all categories)</option>
+            <option value="General Knowledge">General Knowledge</option>
+            <option value="Fun &amp; Pop Culture">Fun &amp; Pop Culture</option>
+            <option value="Science &amp; Nature">Science &amp; Nature</option>
+            <option value="Geography">Geography</option>
+            <option value="History">History</option>
+            <option value="Words &amp; Language">Words &amp; Language</option>
+            <option value="Movies &amp; TV">Movies &amp; TV</option>
+          </select>
+        </div>
+        <div class="field"><label for="opt-level">Difficulty</label>
+          <select id="opt-level">
+            <option value="1">Level 1 · Easiest</option>
+            <option value="2" selected>Level 2 · Easy</option>
+            <option value="3">Level 3 · Medium</option>
+            <option value="4">Level 4 · Hard</option>
+            <option value="5">Level 5 · Hardest</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="field" style="flex:1"><label for="opt-count">Questions</label>
+            <select id="opt-count"><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option></select>
+          </div>
+          <div class="field" style="flex:1"><label for="opt-time">Seconds each</label>
+            <select id="opt-time"><option value="15">15s</option><option value="20" selected>20s</option><option value="30">30s</option></select>
+          </div>
+        </div>
+        <button id="btn-create" class="btn-ghost full">Create game</button>
+        <div id="join-error" class="error"></div>
+        <p class="hint" id="rejoin-hint" style="display:none"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOBBY -->
+  <section id="screen-lobby" class="screen">
+    <div class="wrap">
+      <div class="brandbar"><div class="logo">LS</div><div><h1>Trivia</h1><p class="tagline" id="lobby-sub">Lobby</p></div></div>
+      <div class="card">
+        <label class="mini-label">Room code</label>
+        <div class="roomcode" id="lobby-code">----</div>
+        <div style="text-align:center"><button id="btn-copy" class="btn-ghost">Copy invite link</button></div>
+        <div class="howto"><strong>How to play</strong><ul id="howto-list"></ul></div>
+        <div class="listhead"><span>Players</span><span class="count" id="lobby-count"></span></div>
+        <ul class="playerlist" id="lobby-players"></ul>
+        <button id="btn-start" class="btn-primary full">Start game</button>
+        <p class="hint" id="lobby-hint">Waiting for the host to start…</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section id="screen-game" class="screen">
+    <div class="game-shell">
+      <div class="topbar">
+        <div class="tb-left"><div class="logo sm">LS</div><div class="qprog" id="q-progress"></div></div>
+        <div class="countdown" id="countdown"></div>
+        <div class="tb-right"><button id="btn-feedback" class="iconbtn" title="Feedback">&#128172;</button><button id="btn-mute" class="iconbtn" title="Sound">&#128266;</button></div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-cat" id="q-category"></div>
+        <div class="q-text" id="q-text"></div>
+      </div>
+      <div class="choices" id="choices"></div>
+      <p class="status-line" id="status-line"></p>
+
+      <div id="player-note" class="player-note" style="display:none"></div>
+
+      <div id="mini-board" class="scoreboard" style="display:none"></div>
+
+      <div id="host-dash" class="host-dash" style="display:none">
+        <div class="dash-head"><span>Live answers</span><span class="count" id="dash-count"></span></div>
+        <div class="dash-list" id="dash-list"></div>
+      </div>
+
+      <div id="host-controls" class="host-controls" style="display:none">
+        <button id="btn-reveal" class="btn-ghost">Reveal answer</button>
+        <button id="btn-next" class="btn-primary" style="display:none">Next question</button>
+      </div>
+
+      <button id="btn-leave" class="btn-warn">Leave game</button>
+    </div>
+  </section>
+
+  <!-- DONE -->
+  <section id="screen-done" class="screen">
+    <div class="wrap">
+      <div class="brandbar"><div class="logo">&#127942;</div><div><h1>Final results</h1><p class="tagline">Trivia</p></div></div>
+      <div class="card">
+        <div class="scoreboard big" id="done-board"></div>
+        <button id="btn-again" class="btn-primary full">Play again</button>
+        <button id="btn-feedback-end" class="btn-ghost full" style="margin-top:8px">&#128172; Give feedback</button>
+        <button id="btn-home" class="btn-ghost full" style="margin-top:8px">Back to start</button>
+        <p class="hint" id="done-hint"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEEDBACK MODAL -->
+  <div id="feedback-modal" class="modal" style="display:none">
+    <div class="modal-card">
+      <button id="fb-close" class="modal-x" aria-label="Close">&times;</button>
+      <div id="fb-form">
+        <h3 class="fb-title">How was the game?</h3>
+        <div id="fb-stars" class="stars"><span data-v="1">&#9733;</span><span data-v="2">&#9733;</span><span data-v="3">&#9733;</span><span data-v="4">&#9733;</span><span data-v="5">&#9733;</span></div>
+        <textarea id="fb-comment" placeholder="Anything to add? (optional)"></textarea>
+        <button id="fb-send" class="btn-primary full">Send feedback</button>
+      </div>
+      <div id="fb-thanks" class="fb-thanks" style="display:none">&#127881; Thanks for the feedback!</div>
+    </div>
+  </div>
+
+  <script type="module" src="trivia.js?v=1"></script>
+</body>
+</html>
